@@ -1,0 +1,23 @@
+# Core (works with the offline TF‑IDF retriever in cve_cwe_link.ipynb)
+numpy>=1.23
+scipy>=1.10
+lxml>=4.9
+rank-bm25>=0.2.2
+
+# Notebook environment
+ipykernel>=6.25
+jupyterlab>=4.0
+
+# ---------------------------
+# Optional: Semantic Retriever (preferred Hybrid RAG backend)
+# Install these if you want sentence-transformers/all-mpnet-base-v2 retrieval.
+#
+# NOTE: torch/transformers wheels can be large, and availability depends on your Python version.
+# sentence-transformers>=2.6
+# transformers>=4.40
+# torch>=2.1
+#
+# Optional: Vector DB / ANN index backends (not required by the current notebook)
+# faiss-cpu>=1.7.4
+# chromadb>=0.5
+
