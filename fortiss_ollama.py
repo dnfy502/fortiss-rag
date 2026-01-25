@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 import time
 from typing import Optional
@@ -8,16 +6,6 @@ import requests
 from dotenv import load_dotenv
 
 API_BASE_URL = "https://ollama.fortiss-demo.org"
-
-
-class LLMClient:
-    def complete(self, prompt: str) -> str:
-        raise NotImplementedError
-
-
-class EchoLLM(LLMClient):
-    def complete(self, prompt: str) -> str:
-        return f"[echo] {prompt}"
 
 
 class OllamaClient:
@@ -39,6 +27,7 @@ class OllamaClient:
         response.raise_for_status()
         payload = response.json()
         self._token = payload["access_token"]
+        # Refresh a bit early to avoid edge timing issues.
         self._token_expiry = time.time() + int(payload.get("expires_in", 3600)) - 60
         return self._token
 
@@ -76,15 +65,24 @@ class OllamaClient:
         return data["response"]
 
 
-class OllamaLLM(LLMClient):
-    def __init__(self, model: str, temperature: float) -> None:
-        self._client = OllamaClient()
-        self._model = model
-        self._temperature = temperature
+def generate_text(
+    prompt: str,
+    model: str = "llama3.2:latest",
+    stream: bool = False,
+    temperature: Optional[float] = None,
+    api_key: Optional[str] = None,
+) -> str:
+    client = OllamaClient(api_key=api_key)
+    return client.generate_text(
+        prompt=prompt,
+        model=model,
+        stream=stream,
+        temperature=temperature,
+    )
 
-    def complete(self, prompt: str) -> str:
-        return self._client.generate_text(
-            prompt=prompt,
-            model=self._model,
-            temperature=self._temperature,
-        )
+if __name__ == "__main__":
+    time_start = time.time()
+    prompt = "Explain npm's package lock file in 3 sentences."
+    print(generate_text(prompt, model = 'gpt-oss:120b'))
+    time_end = time.time()
+    print(f"Time taken: {time_end - time_start} seconds")
